@@ -14,7 +14,7 @@ class WinScene extends Phaser.Scene {
         });
 
 
-        this.add.text(WIDTH/2,HEIGHT/2,"You Win!", 
+        this.add.text(WIDTH*CELL_SIZE/2,HEIGHT*CELL_SIZE/2,"You Win!", 
             { 
                 fontSize: "24px", 
                 fontStyle: "bold"

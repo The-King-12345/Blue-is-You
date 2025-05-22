@@ -1,14 +1,14 @@
 const CELL_SIZE = 24;
-const WIDTH = 792;
-const HEIGHT = 432;
+const WIDTH = 33;
+const HEIGHT = 18;
 const sprites = [];
 let arrowKeys;
 let wasdKeys;
 
 const config = {
     type: Phaser.AUTO,
-    width: WIDTH,
-    height: HEIGHT,
+    width: WIDTH * CELL_SIZE,
+    height: HEIGHT * CELL_SIZE,
     pixelArt: true,
     backgroundColor: "#222",
     scene: [GameScene, WinScene]
@@ -31,6 +31,11 @@ function startMove(dx, dy) {
 // recursively call checkMove to check all sprites in a line
 function checkMove(dx, dy, sprite) {
     const nextSprites = getCell(sprite.xPos + dx, sprite.yPos + dy);
+
+    // false if off screen
+    if (sprite.xPos + dx >= WIDTH || sprite.xPos + dx < 0 || sprite.yPos + dy >= HEIGHT || sprite.yPos + dy < 0) {
+        return false;
+    }
 
     // true if all empty ahead
     if (nextSprites == []) {
