@@ -205,6 +205,9 @@ function updateProperties() {
                     for (const belowSprite of belowSprites) {
                         if (belowSprite && (belowSprite.verb || belowSprite.noun)) {
                             changeProps(aboveSprite, belowSprite);
+                            aboveSprite.alpha = 1;
+                            belowSprite.alpha = 1;
+                            sprite.alpha = 1;
                         } 
                     }
                 }
@@ -217,6 +220,9 @@ function updateProperties() {
                     for (const rightSprite of rightSprites) {
                         if (rightSprite && (rightSprite.verb || rightSprite.noun)) {
                             changeProps(leftSprite, rightSprite);
+                            leftSprite.alpha = 1;
+                            rightSprite.alpha = 1;
+                            sprite.alpha = 1;
                         } 
                     }
                 }
@@ -252,8 +258,11 @@ function setAllPropFalse() {
         sprite.push = false;
         sprite.stop = false;
         
+        
         if (sprite.noun || sprite.verb || sprite.is) {
             sprite.push = true;
+
+            sprite.alpha = 0.5;
         }
     }
 }
