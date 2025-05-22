@@ -33,7 +33,6 @@ const CELL_SIZE = 24;
 const sprites = [];
 let arrowKeys;
 let wasdKeys;
-let player;
 
 function create() {
     arrowKeys = this.input.keyboard.createCursorKeys();
@@ -45,8 +44,7 @@ function create() {
     });
 
     // populate all sprites 
-    player = addSprite(this, 12, 10, "blue");
-    player.you = true;
+    addSprite(this, 12, 10, "blue");
     addSprite(this, 20, 10, "green");
 
     addSprite(this, 16, 9, "yellow");
@@ -77,22 +75,25 @@ function create() {
     addSprite(this, 20, 12, "red");
     addSprite(this, 21, 12, "red");
 
-    addText(this, 11, 6, "blueTxt");
-    addText(this, 12, 6, "isTxt");
-    addText(this, 13, 6, "youTxt");
+    addText(this, 11, 6, "blueTxt", "noun");
+    addText(this, 12, 6, "isTxt", "is");
+    addText(this, 13, 6, "youTxt", "verb");
     
-    addText(this, 19, 6, "greenTxt");
-    addText(this, 20, 6, "isTxt");
-    addText(this, 21, 6, "winTxt");
+    addText(this, 19, 6, "greenTxt", "noun");
+    addText(this, 20, 6, "isTxt", "is");
+    addText(this, 21, 6, "winTxt", "verb");
 
-    addText(this, 11, 14, "redTxt");
-    addText(this, 12, 14, "isTxt");
-    addText(this, 13, 14, "stopTxt");
+    addText(this, 11, 14, "redTxt", "noun");
+    addText(this, 12, 14, "isTxt", "is");
+    addText(this, 13, 14, "stopTxt", "verb");
 
-    addText(this, 19, 14, "yellowTxt");
-    addText(this, 20, 14, "isTxt");
-    addText(this, 21, 14, "pushTxt");
+    addText(this, 19, 14, "yellowTxt", "noun");
+    addText(this, 20, 14, "isTxt", "is");
+    addText(this, 21, 14, "pushTxt", "verb");
 
+    setAllPropFalse();
+    updateProperties();
+    updateSprites();
 }
 
 function update() {
@@ -124,6 +125,8 @@ function startMove(dx, dy) {
         }
     }
 
+    setAllPropFalse();
+    updateProperties();
     updateSprites();
 }
 
@@ -166,7 +169,66 @@ function updateSprites() {
     for (const sprite of sprites) {
         sprite.x = sprite.xPos * CELL_SIZE;
         sprite.y = sprite.yPos * CELL_SIZE;
-        sprite.setTexture(sprite.texture);
+        sprite.setTexture(sprite.name);
+    }
+}
+
+function updateProperties() {
+    for (const sprite of sprites) {
+        if (sprite.is) {
+            const aboveSprite = getCell(sprite.xPos, sprite.yPos - 1);
+            const leftSprite = getCell(sprite.xPos - 1, sprite.yPos);
+
+            if (aboveSprite && aboveSprite.noun) {
+                const belowSprite = getCell(sprite.xPos, sprite.yPos + 1);
+
+                if (belowSprite && (belowSprite.verb || belowSprite.noun)) {
+                    changeProps(aboveSprite, belowSprite);
+                } 
+            }
+            
+            if (leftSprite && leftSprite.noun) {
+                
+                const rightSprite = getCell(sprite.xPos + 1, sprite.yPos);
+
+                if (rightSprite && (rightSprite.verb || rightSprite.noun)) {
+                    changeProps(leftSprite, rightSprite);
+                } 
+            }
+        }
+    }
+}
+
+function changeProps(nounTxt, modifierTxt) {
+    for (const sprite of sprites) {
+        if (sprite.name == nounTxt.name.slice(0,-3)) {
+            if (modifierTxt.noun) {
+                sprite.name = modifierTxt.name.slice(0,-3);
+            } else if (modifierTxt.verb) {
+                if (modifierTxt.name == "youTxt") {
+                    sprite.you = true;
+                } else if (modifierTxt.name == "winTxt") {
+                    sprite.win = true;
+                } else if (modifierTxt.name == "pushTxt") {
+                    sprite.push = true;
+                } else if (modifierTxt.name == "stopTxt") {
+                    sprite.stop = true;
+                }
+            }
+        }
+    }
+}
+
+function setAllPropFalse() {
+    for (const sprite of sprites) {
+        sprite.you = false;
+        sprite.win = false;
+        sprite.push = false;
+        sprite.stop = false;
+        
+        if (sprite.noun || sprite.verb || sprite.is) {
+            sprite.push = true;
+        }
     }
 }
 
@@ -174,20 +236,31 @@ function addSprite(scene, x, y, texture) {
     const sprite = scene.add.sprite(x * CELL_SIZE, y * CELL_SIZE, texture).setOrigin(0);
     sprite.xPos = x;
     sprite.yPos = y;
-    sprite.texture = texture;
+    sprite.name = texture;
     sprite.you = false;
     sprite.win = false;
     sprite.push = false;
     sprite.stop = false;
+    sprite.noun = false;
+    sprite.verb = false;
+    sprite.is = false;
 
     sprites.push(sprite)
 
     return sprite
 }
 
-function addText(scene, x, y, texture) {
+function addText(scene, x, y, texture, type) {
     const sprite = addSprite(scene, x, y, texture)
     sprite.push = true;
+    
+    if (type == "noun") {
+        sprite.noun = true;
+    } else if (type == "verb") {
+        sprite.verb = true;
+    } else if (type == "is") {
+        sprite.is = true;
+    }
 
     return sprite
 }
