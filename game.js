@@ -40,10 +40,13 @@ function create() {
         up: "W",
         down: "S",
         left: "A",
-        right: "D"
+        right: "D",
+        reset: "R"
     });
 
     // populate all sprites 
+    sprites.length = 0;
+
     addSprite(this, 11, 8, "red");
     addSprite(this, 12, 8, "red");
     addSprite(this, 13, 8, "red");
@@ -91,10 +94,9 @@ function create() {
     addText(this, 20, 14, "isTxt", "is");
     addText(this, 21, 14, "pushTxt", "verb");
 
-    setAllPropFalse();
-    updateProperties();
-    updateSprites();
+    updateEverything();
 }
+
 
 function update() {
     if (Phaser.Input.Keyboard.JustDown(arrowKeys.up) || Phaser.Input.Keyboard.JustDown(wasdKeys.up)) {
@@ -113,6 +115,9 @@ function update() {
         startMove(1, 0);
     }
 
+    if (Phaser.Input.Keyboard.JustDown(wasdKeys.reset)) {
+        this.scene.restart();
+    }
     
 }
 
@@ -125,9 +130,7 @@ function startMove(dx, dy) {
         }
     }
 
-    setAllPropFalse();
-    updateProperties();
-    updateSprites();
+    updateEverything();
 }
 
 function move(dx, dy, sprite) {
@@ -253,6 +256,12 @@ function setAllPropFalse() {
             sprite.push = true;
         }
     }
+}
+
+function updateEverything() {
+    setAllPropFalse();
+    updateProperties();
+    updateSprites();
 }
 
 function addSprite(scene, x, y, texture) {
