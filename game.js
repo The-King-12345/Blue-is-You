@@ -44,13 +44,6 @@ function create() {
     });
 
     // populate all sprites 
-    addSprite(this, 12, 10, "blue");
-    addSprite(this, 20, 10, "green");
-
-    addSprite(this, 16, 9, "yellow");
-    addSprite(this, 16, 10, "yellow");
-    addSprite(this, 16, 11, "yellow");
-
     addSprite(this, 11, 8, "red");
     addSprite(this, 12, 8, "red");
     addSprite(this, 13, 8, "red");
@@ -74,6 +67,13 @@ function create() {
     addSprite(this, 19, 12, "red");
     addSprite(this, 20, 12, "red");
     addSprite(this, 21, 12, "red");
+    
+    addSprite(this, 16, 9, "yellow");
+    addSprite(this, 16, 10, "yellow");
+    addSprite(this, 16, 11, "yellow");
+    
+    addSprite(this, 20, 10, "green");
+    addSprite(this, 12, 10, "blue");
 
     addText(this, 11, 6, "blueTxt", "noun");
     addText(this, 12, 6, "isTxt", "is");
@@ -131,38 +131,54 @@ function startMove(dx, dy) {
 }
 
 function move(dx, dy, sprite) {
-    const nextSprite = getCell(sprite.xPos + dx, sprite.yPos + dy)
-    if (nextSprite != null && nextSprite.push) {
-        move(dx, dy, nextSprite);
+    const nextSprites = getCell(sprite.xPos + dx, sprite.yPos + dy);
+
+    for (const nextSprite of nextSprites) {
+        if (nextSprite && nextSprite.push) {
+            move(dx, dy, nextSprite);
+        }  
     }
     
     sprite.xPos += dx;
     sprite.yPos += dy;
 }
 
+// recursively call checkMove to check all sprites in a line
 function checkMove(dx, dy, sprite) {
-    const nextSprite = getCell(sprite.xPos + dx, sprite.yPos + dy);
+    const nextSprites = getCell(sprite.xPos + dx, sprite.yPos + dy);
 
-    // recursively call checkMove to check all sprites in a line
-    if (nextSprite == null) {
-        return true;
-    } else if (nextSprite.stop) {
-        return false;
-    } else if (nextSprite.push) {
-        return checkMove(sprite.xPos + dx, sprite.yPos + dy, nextSprite);
-    } else {
+    // true if all empty ahead
+    if (nextSprites == []) {
         return true;
     }
-}
 
-function getCell(xPos, yPos) {
-    for (const sprite of sprites) {
-        if (sprite.xPos == xPos && sprite.yPos == yPos) {
-            return sprite;
+    // false if any stop ahead
+    for (const nextSprite of nextSprites) {
+        if (nextSprite && nextSprite.stop) {
+            return false;
+        }
+    }
+    
+    // recurse if any push ahead
+    for (const nextSprite of nextSprites) {
+        if (nextSprite && nextSprite.push) {
+            return checkMove(dx, dy, nextSprite);
         }
     }
 
-    return null;
+    return true;
+}
+
+function getCell(xPos, yPos) {
+    const res = []
+
+    for (const sprite of sprites) {
+        if (sprite.xPos == xPos && sprite.yPos == yPos) {
+            res.push(sprite);
+        }
+    }
+
+    return res;
 }
 
 function updateSprites() {
@@ -176,24 +192,31 @@ function updateSprites() {
 function updateProperties() {
     for (const sprite of sprites) {
         if (sprite.is) {
-            const aboveSprite = getCell(sprite.xPos, sprite.yPos - 1);
-            const leftSprite = getCell(sprite.xPos - 1, sprite.yPos);
+            const aboveSprites = getCell(sprite.xPos, sprite.yPos - 1);
+            const leftSprites = getCell(sprite.xPos - 1, sprite.yPos);
 
-            if (aboveSprite && aboveSprite.noun) {
-                const belowSprite = getCell(sprite.xPos, sprite.yPos + 1);
+            for (const aboveSprite of aboveSprites) {
+                if (aboveSprite && aboveSprite.noun) {
+                    const belowSprites = getCell(sprite.xPos, sprite.yPos + 1);
 
-                if (belowSprite && (belowSprite.verb || belowSprite.noun)) {
-                    changeProps(aboveSprite, belowSprite);
-                } 
+                    for (const belowSprite of belowSprites) {
+                        if (belowSprite && (belowSprite.verb || belowSprite.noun)) {
+                            changeProps(aboveSprite, belowSprite);
+                        } 
+                    }
+                }
             }
             
-            if (leftSprite && leftSprite.noun) {
-                
-                const rightSprite = getCell(sprite.xPos + 1, sprite.yPos);
+            for (const leftSprite of leftSprites) {
+                if (leftSprite && leftSprite.noun) {
+                    const rightSprites = getCell(sprite.xPos + 1, sprite.yPos);
 
-                if (rightSprite && (rightSprite.verb || rightSprite.noun)) {
-                    changeProps(leftSprite, rightSprite);
-                } 
+                    for (const rightSprite of rightSprites) {
+                        if (rightSprite && (rightSprite.verb || rightSprite.noun)) {
+                            changeProps(leftSprite, rightSprite);
+                        } 
+                    }
+                }
             }
         }
     }
