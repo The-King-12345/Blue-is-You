@@ -33,6 +33,8 @@ class GameScene extends Phaser.Scene {
         game.moveSound = this.sound.add("moveSound", {volume: 0.5});
         game.winSound = this.sound.add("winSound", {volume: 0.5});
 
+        game.lose = false;
+
         // populate all sprites 
         sprites.length = 0;
 

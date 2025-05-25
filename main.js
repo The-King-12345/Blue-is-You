@@ -23,7 +23,10 @@ function startMove(dx, dy) {
         }
     }
 
-    game.moveSound.play();
+    if (!game.lose) {
+        game.moveSound.play();
+    } 
+        
     updateEverything();
 }
 
@@ -88,7 +91,13 @@ function updateEverything() {
     updateProperties();
     updateSprites();
 
-    checkWin();
+    if (checkLose()) {
+        game.lose = true;
+    } else if (checkWin()) {
+        game.winSound.play();
+        game.scene.stop("GameScene");
+        game.scene.start("WinScene");
+    } 
 }
 
 function setAllPropFalse() {
@@ -179,13 +188,21 @@ function checkWin() {
         if (sprite.you) {
             for (const sprite2 of sprites) {
                 if (sprite2.win && sprite2.xPos == sprite.xPos && sprite2.yPos == sprite.yPos) {
-                    game.winSound.play();
-                    game.scene.stop("GameScene");
-                    game.scene.start("WinScene");
+                    return true;
                 }
             }
         }
     }
+    return false;
+}
+
+function checkLose() {
+    for (const sprite of sprites) {
+        if (sprite.you) {
+            return false;
+        }
+    }
+    return true;
 }
 
 function addSprite(scene, x, y, texture) {
