@@ -3,16 +3,11 @@ class WinScene extends Phaser.Scene {
         super("WinScene");
     }
 
-    preload() {
-        this.load.image("blue", "assets/blue.png");
-    }
-
     create() {
         this.input.keyboard.on('keydown', () => {
             this.scene.stop("WinScene")
             this.scene.start("GameScene");
         });
-
 
         this.add.text(WIDTH*CELL_SIZE/2,HEIGHT*CELL_SIZE/2,"You Win!", 
             { 

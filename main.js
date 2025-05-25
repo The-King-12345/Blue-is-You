@@ -46,7 +46,7 @@ function checkMove(dx, dy, sprite) {
 
     // false if any stop ahead
     for (const nextSprite of nextSprites) {
-        if (nextSprite && nextSprite.stop) {
+        if (nextSprite && nextSprite.stop && !nextSprite.push) {
             return false;
         }
     }
