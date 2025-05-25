@@ -2,8 +2,6 @@ const CELL_SIZE = 24;
 const WIDTH = 33;
 const HEIGHT = 18;
 const sprites = [];
-let arrowKeys;
-let wasdKeys;
 
 const config = {
     type: Phaser.AUTO,
@@ -25,6 +23,7 @@ function startMove(dx, dy) {
         }
     }
 
+    game.moveSound.play();
     updateEverything();
 }
 
@@ -180,6 +179,7 @@ function checkWin() {
         if (sprite.you) {
             for (const sprite2 of sprites) {
                 if (sprite2.win && sprite2.xPos == sprite.xPos && sprite2.yPos == sprite.yPos) {
+                    game.winSound.play();
                     game.scene.stop("GameScene");
                     game.scene.start("WinScene");
                 }

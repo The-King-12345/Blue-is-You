@@ -17,17 +17,21 @@ class GameScene extends Phaser.Scene {
         this.load.image("pushTxt", "assets/pushTxt.png");
         this.load.image("stopTxt", "assets/stopTxt.png");
         this.load.image("isTxt", "assets/isTxt.png");
+        this.load.audio("moveSound", "assets/audio/drop_003.ogg");
+        this.load.audio("winSound", "assets/audio/confirmation_002.ogg");
     }
 
     create() {
-        arrowKeys = this.input.keyboard.createCursorKeys();
-        wasdKeys = this.input.keyboard.addKeys({
+        game.arrowKeys = this.input.keyboard.createCursorKeys();
+        game.wasdKeys = this.input.keyboard.addKeys({
             up: "W",
             down: "S",
             left: "A",
             right: "D",
             reset: "R"
         });
+        game.moveSound = this.sound.add("moveSound", {volume: 0.5});
+        game.winSound = this.sound.add("winSound", {volume: 0.5});
 
         // populate all sprites 
         sprites.length = 0;
@@ -83,23 +87,23 @@ class GameScene extends Phaser.Scene {
     }
 
     update() {
-        if (Phaser.Input.Keyboard.JustDown(arrowKeys.up) || Phaser.Input.Keyboard.JustDown(wasdKeys.up)) {
+        if (Phaser.Input.Keyboard.JustDown(game.arrowKeys.up) || Phaser.Input.Keyboard.JustDown(game.wasdKeys.up)) {
             startMove(0, -1);
         }
 
-        if (Phaser.Input.Keyboard.JustDown(arrowKeys.down) || Phaser.Input.Keyboard.JustDown(wasdKeys.down)) {
+        if (Phaser.Input.Keyboard.JustDown(game.arrowKeys.down) || Phaser.Input.Keyboard.JustDown(game.wasdKeys.down)) {
             startMove(0, 1);
         }
 
-        if (Phaser.Input.Keyboard.JustDown(arrowKeys.left) || Phaser.Input.Keyboard.JustDown(wasdKeys.left)) {
+        if (Phaser.Input.Keyboard.JustDown(game.arrowKeys.left) || Phaser.Input.Keyboard.JustDown(game.wasdKeys.left)) {
             startMove(-1, 0);
         }
 
-        if (Phaser.Input.Keyboard.JustDown(arrowKeys.right) || Phaser.Input.Keyboard.JustDown(wasdKeys.right)) {
+        if (Phaser.Input.Keyboard.JustDown(game.arrowKeys.right) || Phaser.Input.Keyboard.JustDown(game.wasdKeys.right)) {
             startMove(1, 0);
         }
 
-        if (Phaser.Input.Keyboard.JustDown(wasdKeys.reset)) {
+        if (Phaser.Input.Keyboard.JustDown(game.wasdKeys.reset)) {
             this.scene.restart();
         }
         
