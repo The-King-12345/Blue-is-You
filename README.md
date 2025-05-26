@@ -1,3 +1,18 @@
 # Blue is You
 
-This project is a recreation of the first level of the puzzle game "Baba is You" using the Phaser javascript library.
+A recreation of the first level from *Baba Is You* built with Phaser 3, showcasing puzzle mechanics, rule-based interactions, and tile-based movement.
+
+## Controls
+
+| Key              | Action         |
+|------------------|----------------|
+| `WASD` / `↑←↓→`  | Move           |
+| `R`              | Restart        |
+| `U`              | Undo           |
+
+## Built With
+
+- Phaser 3
+- Javascript 
+- HTML5
+- CSS
