@@ -1,7 +1,9 @@
 const CELL_SIZE = 24;
 const WIDTH = 33;
 const HEIGHT = 18;
+const MAX_UNDO = 100;
 const sprites = [];
+const undoStack = [];
 
 const config = {
     type: Phaser.AUTO,
@@ -15,6 +17,11 @@ const config = {
 const game = new Phaser.Game(config);
 
 function startMove(dx, dy) {
+    if (!game.lose) {
+        game.moveSound.play();
+        saveState();
+    }
+
     for (const sprite of sprites) {
         if (sprite.you) {
             if (checkMove(dx, dy, sprite)) {
@@ -22,10 +29,6 @@ function startMove(dx, dy) {
             }
         }
     }
-
-    if (!game.lose) {
-        game.moveSound.play();
-    } 
         
     updateEverything();
 }
@@ -91,9 +94,9 @@ function updateEverything() {
     updateProperties();
     updateSprites();
 
-    if (checkLose()) {
-        game.lose = true;
-    } else if (checkWin()) {
+    game.lose = hasLost();
+
+    if (hasWon()) {
         game.winSound.play();
         game.scene.stop("GameScene");
         game.scene.start("WinScene");
@@ -183,7 +186,7 @@ function updateSprites() {
     }
 }
 
-function checkWin() {
+function hasWon() {
     for (const sprite of sprites) {
         if (sprite.you) {
             for (const sprite2 of sprites) {
@@ -196,7 +199,7 @@ function checkWin() {
     return false;
 }
 
-function checkLose() {
+function hasLost() {
     for (const sprite of sprites) {
         if (sprite.you) {
             return false;
@@ -236,4 +239,53 @@ function addText(scene, x, y, texture, type) {
     }
 
     return sprite
+}
+
+function saveState() {
+    const state = sprites.map(s => ({
+        xPos: s.xPos,
+        yPos: s.yPos,
+        name: s.name,
+    }));
+
+    const lastState = undoStack[undoStack.length - 1];
+    let isSame = lastState && state.length === lastState.length;
+
+    if (isSame) {
+        for (let i = 0; i < state.length; i++) {
+            const curr = state[i];
+            const prev = lastState[i];
+            
+            if (curr.xPos !== prev.xPos || curr.yPos !== prev.yPos || curr.name !== prev.name) {
+                isSame = false;
+                break;
+            }
+        }
+    }
+
+    // save if the state has changed
+    if (!isSame) {
+        undoStack.push(state);
+
+        if (undoStack.length > MAX_UNDO) {
+            undoStack.shift();
+        }
+    }
+}
+
+function undo() {
+    if (undoStack.length === 0) return; 
+
+    const prevState = undoStack.pop();
+
+    for (let i = 0; i < sprites.length; i++) {
+        const s = sprites[i];
+        const prev = prevState[i];
+
+        s.xPos = prev.xPos;
+        s.yPos = prev.yPos;
+        s.name = prev.name;
+    }
+
+    updateEverything();
 }

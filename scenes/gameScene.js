@@ -28,16 +28,17 @@ class GameScene extends Phaser.Scene {
             down: "S",
             left: "A",
             right: "D",
-            reset: "R"
+            reset: "R",
+            undo: "Z"
         });
         game.moveSound = this.sound.add("moveSound", {volume: 0.5});
         game.winSound = this.sound.add("winSound", {volume: 0.5});
 
         game.lose = false;
+        sprites.length = 0;
+        undoStack.length = 0;
 
         // populate all sprites 
-        sprites.length = 0;
-
         addSprite(this, 11, 8, "red");
         addSprite(this, 12, 8, "red");
         addSprite(this, 13, 8, "red");
@@ -107,6 +108,10 @@ class GameScene extends Phaser.Scene {
 
         if (Phaser.Input.Keyboard.JustDown(game.wasdKeys.reset)) {
             this.scene.restart();
+        }
+
+        if (Phaser.Input.Keyboard.JustDown(game.wasdKeys.undo)) {
+            undo();
         }
         
     }
