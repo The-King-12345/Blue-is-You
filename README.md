@@ -2,6 +2,8 @@
 
 A recreation of the first level from *Baba Is You* built with Phaser 3, showcasing puzzle mechanics, rule-based interactions, and tile-based movement.
 
+![](assets/screenshot.png)
+
 ## Controls
 
 | Key              | Action         |
